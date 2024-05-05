@@ -37,10 +37,9 @@ public class WarehouseController : ControllerBase
 
         if (!await _orderRepository.DoesFulfilledAt(idOrder))
             return NotFound("Fulfilled at error");
-
-        // todo nie wiem co autor zadania mial na mysli zeby sprawdzic czy order istnieje w danym fulfilled at???????????
-        /*if (!await _productWarehouse.DoesOrderExistInProduct_Warehouse(idOrder))
-            return NotFound("Order doesn't exist in product_warehouse");*/
+        
+        if (await _productWarehouse.DoesOrderExistInProduct_Warehouse(idOrder))
+            return NotFound("Order exist in product_warehouse");
         
         using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
