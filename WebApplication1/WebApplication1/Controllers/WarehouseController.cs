@@ -1,4 +1,5 @@
-﻿using System.Transactions;
+﻿using System.Diagnostics;
+using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Repositories;
 
@@ -23,21 +24,23 @@ public class WarehouseController : ControllerBase
     [Route("api/scope/{idProduct:int}/{idWarehouse:int}/{amount:int}/{createdAt:datetime}")]
     public async Task<IActionResult> AddRecordToProduct_Warehouse(int idProduct, int idWarehouse, int amount, DateTime createdAt)
     {
+        Console.WriteLine("alsldlasldasda");
         if(! await _productRepository.DoesProductExist(idProduct))
-            return NotFound();
+            return NotFound("Product doesn't exist");
 
         if (!await _warehouseRepository.DoesWarehouseExist(idWarehouse))
-            return NotFound();
+            return NotFound("Warehouse doesn't exist");
         
         var idOrder = await _orderRepository.DoesOrderWithAmountAndThisProductExist(idProduct, amount, createdAt);
         if (idOrder == -1)
-            return NotFound();
+            return NotFound("Order with this amount doesn't exist or bad data");
 
         if (!await _orderRepository.DoesFulfilledAt(idOrder))
-            return NotFound();
+            return NotFound("Fulfilled at error");
 
-        if (!await _productWarehouse.DoesOrderExistInProduct_Warehouse(idOrder))
-            return NotFound();
+        // todo nie wiem co autor zadania mial na mysli zeby sprawdzic czy order istnieje w danym fulfilled at???????????
+        /*if (!await _productWarehouse.DoesOrderExistInProduct_Warehouse(idOrder))
+            return NotFound("Order doesn't exist in product_warehouse");*/
         
         using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {

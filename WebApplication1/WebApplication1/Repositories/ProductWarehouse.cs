@@ -42,13 +42,14 @@ public class ProductWarehouse : IProductWarehouse
         await connection.OpenAsync();
         
         var reader = await command.ExecuteReaderAsync();
-        int price = 0;
+        decimal price = 0;
         if (await reader.ReadAsync())
         {
-            int priceOrdinal = reader.GetOrdinal("Price");
-            price = reader.GetInt32(priceOrdinal);
+            var priceOrdinal = reader.GetOrdinal("Price");
+            price = reader.GetDecimal(priceOrdinal);
         }
-
+        
+        await connection.CloseAsync();
         price *= amount;
         
         var query2 = "INSERT INTO Product_Warehouse VALUES(@IdWarehouse, @IdProduct, @IdOrder, @Amount, @Price, @CreatedAt)";
@@ -67,5 +68,6 @@ public class ProductWarehouse : IProductWarehouse
 
         await connection2.OpenAsync();
         await command2.ExecuteNonQueryAsync();
+        await connection2.CloseAsync();
     }
 }

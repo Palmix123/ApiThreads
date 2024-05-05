@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace WebApplication1.Repositories;
 
@@ -16,7 +17,7 @@ public class ProductRepository : IProductRepository
 
         await using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
         await using SqlCommand command = new SqlCommand();
-
+        
         command.Connection = connection;
         command.CommandText = query;
         command.Parameters.AddWithValue("@IdProduct", id);
@@ -24,7 +25,7 @@ public class ProductRepository : IProductRepository
         await connection.OpenAsync();
 
         var res = await command.ExecuteScalarAsync();
-        
+        await connection.CloseAsync();
         return res is not null;
     }
 }

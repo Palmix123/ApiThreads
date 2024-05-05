@@ -36,6 +36,7 @@ public class OrderRepository : IOrderRepository
                 return idOrder;
             }
         }
+        await connection.CloseAsync();
         return -1; // todo do sprawdzenia
     }
 
@@ -48,12 +49,12 @@ public class OrderRepository : IOrderRepository
 
         command.Connection = connection;
         command.CommandText = query;
-        command.Parameters.AddWithValue("@IdProduct", idOrder);
+        command.Parameters.AddWithValue("@IdOrder", idOrder);
 
         await connection.OpenAsync();
 
         var res = await command.ExecuteScalarAsync();
-        
+        await connection.CloseAsync();
         return res is not null;
     }
 
@@ -71,5 +72,7 @@ public class OrderRepository : IOrderRepository
         await connection.OpenAsync();
 
         var res = await command.ExecuteScalarAsync();
+
+        await connection.CloseAsync();
     }
 }
